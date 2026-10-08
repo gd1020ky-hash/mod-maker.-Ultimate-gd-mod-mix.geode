@@ -13,7 +13,6 @@
 
 using namespace geode::prelude;
 
-// --- High Accuracy Macro Replay Format Struct ---
 struct MacroInput {
     int frame;
     int button;      
@@ -22,7 +21,9 @@ struct MacroInput {
     double playerY;
 };
 
-// 
+// =========================================================================
+// 🌐 ULTIMATE GD MOD MIX GLOBAL MANAGER
+// =========================================================================
 class UltimateGDModMixManager {
 public:
     static UltimateGDModMixManager* get() {
@@ -30,29 +31,21 @@ public:
         return &instance;
     }
 
-    //
     bool noclip = false;
     bool instantRespawn = false;
     bool startPosSwitcher = true;
-
-    // 
     bool showHitboxes = false;
     bool layoutMode = false;
     bool showTrajectory = false;
     bool clockFromAttemptPercent = true; 
-
-    //
     bool infiniteScaleBypass = true;
     bool absoluteObjectLimitBypass = true;
-
-    // 🤖 Automation & Macros (Echo / xdBot)
     bool frameStepperActive = false;
     bool clickBotAudio = false;
     int currentFrame = 0;
     std::vector<MacroInput> activeMacro;
     size_t playbackIndex = 0;
 
-    // 📂 MULTI-FORMAT REPLAY PARSER ROUTING ENGINE
     void routeAndLoadMacro(const std::filesystem::path& path) {
         if (!std::filesystem::exists(path)) return;
         std::string ext = path.extension().string();
@@ -99,7 +92,7 @@ private:
             file.read(reinterpret_cast<char*>(&inputByte), sizeof(inputByte));
             file.read(reinterpret_cast<char*>(&input.playerX), sizeof(double));
             file.read(reinterpret_cast<char*>(&input.playerY), sizeof(double));
-            input.frame = deltaFrame;
+            input.frame = static_cast<int>(deltaFrame);
             input.isPress = (inputByte & 1) != 0;
             input.button = (inputByte & 2) != 0 ? 2 : 1;
             activeMacro.push_back(input);
@@ -108,13 +101,86 @@ private:
 };
 
 // =========================================================================
-// 🎮 GAMEPLAY INTERCEPTIONS (PlayLayer)
+// 📱 ANDROID FLOATING OVERLAY MENU LAYER
 // =========================================================================
+class FloatingMenuLayer : public FLAlertLayer {
+public:
+    static FloatingMenuLayer* create() {
+        auto ret = new FloatingMenuLayer();
+        if (ret && ret->init(240, 320, "GJ_square01.png", "Ultimate Mix Menu")) {
+            ret->autorelease();
+            return ret;
+        }
+        CC_SAFE_DELETE(ret);
+        return nullptr;
+    }
+
+    bool setup() override {
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
+        auto background = CCScale9Sprite::create("GJ_square01.png");
+        background->setContentSize(CCSize(320, 240));
+        background->setPosition(winSize / 2);
+        this->addChild(background);
+
+        auto title = CCLabelBMFont::create("Ultimate Mod Mix", "bigFont.fnt");
+        title->setPosition(winSize.width / 2, winSize.height / 2 + 100);
+        title->setScale(0.6f);
+        this->addChild(title);
+
+        auto menu = CCMenu::create();
+        auto noclipLabel = CCLabelBMFont::create("Toggle Noclip", "goldFont.fnt");
+        noclipLabel->setScale(0.5f);
+        auto noclipBtn = CCMenuItemSpriteExtra::create(
+            noclipLabel, nullptr, this, menu_selector(FloatingMenuLayer::onToggleNoclip)
+        );
+        menu->addChild(noclipBtn);
+
+        auto closeLabel = CCLabelBMFont::create("Close", "bigFont.fnt");
+        closeLabel->setScale(0.4f);
+        auto closeBtn = CCMenuItemSpriteExtra::create(
+            closeLabel, nullptr, this, menu_selector(FloatingMenuLayer::onClose)
+        );
+        closeBtn->setPosition(0, -80);
+        menu->addChild(closeBtn);
+
+        menu->setPosition(winSize / 2);
+        this->addChild(menu);
+        return true;
+    }
+
+    void onToggleNoclip(CCObject*) {
+        auto manager = UltimateGDModMixManager::get();
+        manager->noclip = !manager->noclip;
+        FLAlertLayer::create("Mix Menu", manager->noclip ? "Noclip ENABLED!" : "Noclip DISABLED!", "OK")->show();
+    }
+
+    void onClose(CCObject*) {
+        this->removeFromParentAndCleanup(true);
+    }
+};
+
 class $modify(MixPlayLayer, PlayLayer) {
-    void updateProgressbar() {
-        PlayLayer::updateProgressbar();
-        if (UltimateGDModMixManager::get()->clockFromAttemptPercent) {
-            // Precision data parsing loop hooks here
+    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
+        auto floatMenu = CCMenu::create();
+        auto btnSprite = CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png");
+        btnSprite->setOpacity(150); 
+        
+        auto floatBtn = CCMenuItemSpriteExtra::create(
+            btnSprite, nullptr, this, menu_selector(MixPlayLayer::onOpenFloatingMenu)
+        );
+        
+        floatMenu->addChild(floatBtn);
+        floatMenu->setPosition(winSize.width - 30, winSize.height - 30);
+        this->addChild(floatMenu, 999); 
+        return true;
+    }
+
+    void onOpenFloatingMenu(CCObject*) {
+        if (auto menuLayer = FloatingMenuLayer::create()) {
+            this->addChild(menuLayer, 1000);
         }
     }
 
@@ -133,28 +199,15 @@ class $modify(MixPlayLayer, PlayLayer) {
     }
 };
 
-// =========================================================================
-// 🎨 ENGINE INPUT & VISUAL LOOPS (GJBaseGameLayer)
-// =========================================================================
 class $modify(MixBaseGameLayer, GJBaseGameLayer) {
     void update(float dt) {
         GJBaseGameLayer::update(dt);
-        if (UltimateGDModMixManager::get()->showTrajectory && this->m_player1) {
-            // Trajectory rendering calculations hook here
-        }
-    }
-
-    void handleButton(bool push, int button, bool player1) {
-        GJBaseGameLayer::handleButton(push, button, player1);
-        if (UltimateGDModMixManager::get()->clickBotAudio && push) {
-            // Sound processing logic registers here
-        }
     }
 };
 
-//
-// 
-// 
+// =========================================================================
+// 🏗️ AI AUTO-GENERATOR & CONTEXTUAL THEME PARSER (LevelEditorLayer)
+// =========================================================================
 class $modify(MixEditorLayer, LevelEditorLayer) {
     bool init(GJGameLevel* level, bool p1) {
         if (!LevelEditorLayer::init(level, p1)) return false;
@@ -163,7 +216,13 @@ class $modify(MixEditorLayer, LevelEditorLayer) {
         std::string difficulty = Mod::get()->getSettingValue<std::string>("gen-difficulty");
         std::string theme = Mod::get()->getSettingValue<std::string>("gen-theme");
 
-        generateGameplayLayout(difficulty);
+        if (difficulty == "custom") {
+            std::string levelTarget = Mod::get()->getSettingValue<std::string>("custom-level-id");
+            log::info("Custom Layout Profile Detected: Parsing canvas blocks from target: {}", levelTarget);
+        } else {
+            generateGameplayLayout(difficulty);
+        }
+
         applyThemeDecoration(theme);
         return true;
     }
@@ -179,13 +238,9 @@ class $modify(MixEditorLayer, LevelEditorLayer) {
 private:
     void generateGameplayLayout(const std::string& difficulty) {
         int totalStructures = 60; float currentX = 300.0f; float currentY = 105.0f;
-        log::info("Humanized AI Generation engine active. Target: {}", difficulty);
 
         for (int i = 0; i < totalStructures; i++) {
-            //
             int blockLength = 3 + (std::rand() % 4); 
-            
-            // Re-tune scaling limits strictly for ILL Mode parameters (Top 10 Main List)
             if (difficulty == "ILL") {
                 blockLength = 2 + (std::rand() % 2);
             }
@@ -195,7 +250,6 @@ private:
                 auto block = this->createObject(1, CCPoint(blockX, currentY), false);
                 if (block) this->m_objects->addObject(block);
 
-                //
                 if (b == 0 || b == blockLength - 1) {
                     float fillY = currentY - 30.0f;
                     while (fillY >= 105.0f) {
@@ -206,37 +260,6 @@ private:
                 }
             }
 
-            //
             if (difficulty == "ILL") {
                 for (int b = 0; b < blockLength; b++) {
                     auto ceiling = this->createObject(1, CCPoint(currentX + (b * 30.0f), currentY + 75.0f), false);
-                    if (ceiling) this->m_objects->addObject(ceiling);
-                    
-                    if (b % 2 == 0) {
-                        auto ceilingSpike = this->createObject(8, CCPoint(currentX + (b * 30.0f), currentY + 45.0f), false);
-                        if (ceilingSpike) {
-                            ceilingSpike->setRotation(180.0f); 
-                            ceilingSpike->setScale(0.80f); // Tight frame bounds adjustment
-                            this->m_objects->addObject(ceilingSpike);
-                        }
-                    }
-                }
-            } else {
-                auto spike1 = this->createObject(8, CCPoint(currentX + 30.0f, currentY + 30.0f), false);
-                auto spike2 = this->createObject(8, CCPoint(currentX + (blockLength * 30.0f) - 60.0f, currentY + 30.0f), false);
-                if (spike1) this->m_objects->addObject(spike1);
-                if (spike2) this->m_objects->addObject(spike2);
-            }
-
-            /
-            if (i % 2 == 0) {
-                float transitionX = currentX + (blockLength * 30.0f) + 45.0f;
-                auto orb = this->createObject(36, CCPoint(transitionX, currentY + 30.0f), false);
-                if (orb) this->m_objects->addObject(orb);
-            }
-
-            // Gapping calculations based on speed metrics
-            float horizontalGap = (difficulty == "ILL") ? (70.0f + (std::rand() % 30)) : (140.0f + (std::rand() % 60)); 
-            currentX += (blockLength * 30.0f) + horizontalGap;
-
-            float heightShift = (std::rand() % 2 == 0) ? 30.0f : -30.0f;
