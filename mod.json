@@ -4,7 +4,7 @@
     "version": "v1.0.0",
     "name": "Ultimate GD Mod Mix",
     "developer": "YourName",
-    "description": "The ultimate compilation suite. Features cheats, macros, visual path predictions, and humanized ILL level generation workflows.",
+    "description": "The ultimate compilation suite. Features floating overlay menu, cheats, high-accuracy bots, and contextual level style replication engines.",
     "dependencies": [
         {
             "id": "geode.custom-keybinds",
@@ -37,13 +37,22 @@
             "type": "string",
             "default": "easy-demon",
             "name": "Target Level Difficulty",
-            "one-of": ["auto", "easy", "medium", "hard", "insane", "easy-demon", "hard-demon", "extreme-demon", "ILL"]
+            "one-of": [
+                "auto", "easy", "normal", "hard", "harder", "insane", 
+                "easy-demon", "medium-demon", "hard-demon", "insane-demon", "extreme-demon", "ILL", "custom"
+            ]
+        },
+        "custom-level-id": {
+            "type": "string",
+            "default": "12345678",
+            "name": "Custom Level Name / ID Target",
+            "description": "Used when Difficulty OR Theme is set to 'custom' to parse specified canvas data structures."
         },
         "gen-theme": {
             "type": "string",
             "default": "cyberpunk",
             "name": "Decoration Style Theme",
-            "one-of": ["blast-processing", "hell-style", "cyberpunk", "sunset-glow", "minimalist"]
+            "one-of": ["blast-processing", "hell-style", "cyberpunk", "sunset-glow", "minimalist", "custom"]
         }
     }
 }
