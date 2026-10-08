@@ -1,0 +1,49 @@
+{
+    "geode": "5.10.1",
+    "id": "yourusername.ultimate_gd_mod_mix",
+    "version": "v1.0.0",
+    "name": "Ultimate GD Mod Mix",
+    "developer": "YourName",
+    "description": "The ultimate compilation suite. Features cheats, macros, visual path predictions, and humanized ILL level generation workflows.",
+    "dependencies": [
+        {
+            "id": "geode.custom-keybinds",
+            "version": ">=1.11.0",
+            "importance": "required"
+        }
+    ],
+    "platforms": ["android", "win"],
+    "settings": {
+        "cat-cheats": { "type": "title", "name": "🟢 Mega Hack / Eclipse Features" },
+        "noclip": { "type": "bool", "default": false, "name": "Noclip Override Engine" },
+        "instant-respawn": { "type": "bool", "default": false, "name": "Instant Respawn Toggle" },
+        "startpos-switcher": { "type": "bool", "default": true, "name": "StartPos Dynamic Switcher" },
+
+        "cat-visuals": { "type": "title", "name": "🔵 Prism / QOLMod Visuals" },
+        "hitboxes": { "type": "bool", "default": false, "name": "Show Precise Layer Hitboxes" },
+        "trajectory": { "type": "bool", "default": false, "name": "Show Physics Prediction Trajectory" },
+        "layout-mode": { "type": "bool", "default": false, "name": "Force Global Layout Render Mode" },
+
+        "cat-silicate": { "type": "title", "name": "🟡 Silicate Editor Elements" },
+        "scale-bypass": { "type": "bool", "default": true, "name": "Infinite Object Scale Bypass" },
+        "object-bypass": { "type": "bool", "default": true, "name": "Absolute Object Density Bypass" },
+
+        "cat-bots": { "type": "title", "name": "🟣 Echo / xdBot Operations" },
+        "clickbot": { "type": "bool", "default": false, "name": "Dynamic ClickBot Sound Generation" },
+        "stepper": { "type": "bool", "default": false, "name": "Enable Frame-Stepper Matrix Controls" },
+
+        "enable-ai-gen": { "type": "bool", "default": true, "name": "🤖 Enable AI Generation Modifiers" },
+        "gen-difficulty": {
+            "type": "string",
+            "default": "easy-demon",
+            "name": "Target Level Difficulty",
+            "one-of": ["auto", "easy", "medium", "hard", "insane", "easy-demon", "hard-demon", "extreme-demon", "ILL"]
+        },
+        "gen-theme": {
+            "type": "string",
+            "default": "cyberpunk",
+            "name": "Decoration Style Theme",
+            "one-of": ["blast-processing", "hell-style", "cyberpunk", "sunset-glow", "minimalist"]
+        }
+    }
+}
